@@ -1,0 +1,52 @@
+---
+publishDate: 2024-07-16T00:00:00Z
+title: Are barrel files worth it?
+category: 'Generic'
+image: '/imgs/barrel.jpg'
+tags:
+  - barrel-files
+  - general-advice
+---
+
+## Introduction
+
+To start off with I think it's a good idea to understand exactly what barrel files are. They are index files that re-export other modules. Here is an example of what a barrel file may look like.
+
+```typescript
+export * from './packageA';
+export * from './packageB';
+export * from './packageC';
+```
+
+So why do libraries general use a barrel file? well it's to improve the developer experience but it comes at a great cost to performance which will be explained later on. Firstly lets see how barrel files improve the developer experience. The below example is how we import when using barrel files.
+
+```typescript
+import { func, func2, func3 } from '@myPackage';
+```
+
+Compare the above to how we would have to import these functions without a barrel file
+
+```typescript
+import { func } from '@myPackage/func';
+import { func2 } from '@myPackage/func2';
+import { func3 } from '@myPackage/func3';
+```
+
+You can imagine as the amount of imports you have increases, so does the amount of lines in a linear fashion. This is the only downside that I've seen from not using a barrel file. Whereas lets look at the downsides of using a barrel file. First of all the performance implications can be massive. If we use the example above, then you can imagine if we just imported `func` on it's own.
+
+```typescript
+import { func } from '@myPackage';
+```
+
+We would still be importing `func2` and `func3` despite us not using those functions. This has huge implications for large libraries that have 1000s of exports, an example of this would be `@mui/icons-material` which has over 10000 exports. NextJS had a huge problem with these types of libraries that they had to come up with their own bundler solution which you can read about here - [how we optimized package imports in NextJS](https://vercel.com/blog/how-we-optimized-package-imports-in-next-js)
+
+If you use barrel files you are also relying on your bundler to do tree shaking for any unused exports. This can lead to a lot of complications especially with how many bundlers we have and they all work slightly differently. For example if you've used webpack you've probably comes across this [page](https://webpack.js.org/guides/tree-shaking/) in regards to tree shaking and using the `"sideEffects": false` in your `package.json`. I've found this to be ineffective is some cases and would rather just avoid this entire complication.
+
+## What do I recommend?
+
+In general I would stick to never using barrel files and instead importing the files directly. This comes with the multiple benefits of easy code splitting, tree shaking and improved performance for your dev/build server. The minor disadvantage of having longer imports does not make up for the massive downsides.
+
+## Extra reading
+
+- [https://marvinh.dev/blog/speeding-up-javascript-ecosystem-part-7/](https://marvinh.dev/blog/speeding-up-javascript-ecosystem-part-7/)
+- [https://dev.to/thepassle/barrel-files-a-case-study-o5p](https://dev.to/thepassle/barrel-files-a-case-study-o5p)
