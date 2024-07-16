@@ -1,6 +1,6 @@
 site:
-  name: AstroWind
-  site: 'https://astrowind.vercel.app'
+  name: Ryan Davis blog site
+  site: 'https://personal-blog-vert-two.vercel.app'
   base: '/'
   trailingSlash: false
 
